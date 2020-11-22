@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="http://127.0.0.1:5000/img/bootstrap.min.css">
+
+        <title>IntensiveScope</title>
+
+        <style type="text/css">
+            #my_camera {
+                width: 414px;
+                height: 310px;
+                background-color: #aaa;
+            }
+
+        .tick {
+          fill-opacity: 0;
+          stroke: #000000;
+          stroke-width: 1;
+        }
+        .axis line {
+                    fill: none;
+                    fill-opacity: 0;
+                    stroke: black;
+                    stroke-width: 1;
+                    shape-rendering: crispEdges;
+                }
+
+        .axis text {
+            font-family: sans-serif;
+            font-size: 0px;
+        }
+        .circle {
+          fill-opacity: .99;
+          stroke-opacity: 0.99;
+          stroke-width: 1;
+          /*fill: #456;*/
+          /*stroke: #456;*/
+        }
+
+        #center-circle {
+            stroke:rgb(255,0,0);
+            stroke-width: 1;
+            fill-opacity: 0;
+        }
+
+        svg rect.foo {
+          fill: white;
+          stroke-width: 0.5;
+          stroke: grey;
+        }
+
+        #nearest {
+            display: none;
+        }
+
+        .widget {
+            margin: 0 auto;
+            width:350px;
+            margin-top:50px;
+            background-color:#fff;
+            border-radius: 5px;
+            box-shadow: 1px 1px 4px 0px rgba(0,0,0,0.3);
+
+        }
+        .widget-header{
+            background-color: #eee;
+            height:40px;
+            color:#555;
+            text-align: center;
+            line-height: 40px;
+            border-top-left-radius: 7px;
+            border-top-right-radius: 7px;
+            font-weight: 400;
+            font-size: 1.5em;
+            text-shadow: 1px 1px #fff;
+            border-bottom: 1px solid #eaeaea;
+        }
+        .chart-container{
+            padding:25px;
+        }
+
+        /* Page content */
+        .main {
+            margin-left: 200px; /* Same as the width of the sidenav */
+        }
+        .container_videos {
+            display: inline-flex; /* or inline-flex */
+            min-height: 480px
+        }
+        #personnelHeader {
+            padding:9px 15px;
+            border-bottom:1px solid #eee;
+            background-color: #0480be;
+            -webkit-border-top-left-radius: 5px;
+            -webkit-border-top-right-radius: 5px;
+            -moz-border-radius-topleft: 5px;
+            -moz-border-radius-topright: 5px;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+        #warningHeader {
+            padding:9px 15px;
+            border-bottom:1px solid #eee;
+            background-color: #DB1F48;
+            -webkit-border-top-left-radius: 5px;
+            -webkit-border-top-right-radius: 5px;
+            -moz-border-radius-topleft: 5px;
+            -moz-border-radius-topright: 5px;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+        #room1_container {
+            background-color: #000000
+        }
+        #room2_container {
+            background-color: #000000
+        }
+        .video-section img {
+        text-align: center;
+        }
+        .room1 {
+            background-color: #ffffff
+        }
+        .room2 {
+            background-color: #ffffff
+        }
+        </style>
+    </head>
+    <body>
+        <div id="main">
+            <nav class="navbar navbar-dark bg-primary">
+                <a class="navbar-brand" href="#">
+                    <img src="img/ikem_181_158_white.png" alt="IKEM" width="20"/>
+                    IntensiveScope
+                </a>
+            </nav>
+            <div class="container_videos">
+                <div class="row">
+                    <div id="room1_container" class="col video_section">
+                        <img src="{{ url_for('video_feed') }}?room_id=room1",  class="img-fluid" height="100%", id="room1">
+<!--                         <div class="float-" style="position:relative;top:-370px;">
+                            <img src="http://127.0.0.1:5000/img/circle_transparent.gif" alt="point" width="32" height="32"/>
+                        </div> -->
+                    </div>
+                    <div id="room2_container" class="col video_section">
+                        <img src="{{ url_for('video_feed') }}?room_id=room2",  class="img-fluid" width="100%", height="30%", id="room2">
+<!--                         <div class="float-right" style="position:relative;top:-370px;">
+                            <img src="http://127.0.0.1:5000/img/circle_transparent.gif" alt="point" width="32" height="32"/>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+
+    <!--         <div id="calibration">
+                <div class="card-header bg-primary text-white">
+                    Calibration:
+                </div>
+                <div id="chart"></div>
+            </div>
+            <div id="nearest">
+                <div class="card-header bg-info text-white">
+                    Nearest picture:
+                </div>
+                <img src="http://127.0.0.1:5000/img/single-tmave_007.png" width="414" height="310" id="nearest-image"/>
+            </div> -->
+
+
+            <div class="container">
+                <div class="row">
+                    <div class="col room1">
+                        <h4 class="modal-title">Pokoj 1</h4>
+                        <table class="table table-hover">
+                            <tbody>
+                            <tr>
+                                <td>Situace</td>
+                                <td><span id="room1situation">normální</span></td>
+                            </tr>
+                            <tr>
+                                <td>Počet osob</td>
+                                <td><span id="room1people">2</span></td>
+                            </tr>
+                            <tr>
+                                <td>Personál</td>
+                                <td><span id="room1doctor_str">ne</span></td>
+                            </tr>
+                            <tr>
+                                <td>Poslední kontrola</td>
+                                <td>před <span id="room1check">20</span> min</td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                    <div class="col room2">
+                        <h4 class="modal-title">Pokoj 2</h4>
+                        <table class="table table-hover">
+                            <tbody>
+                            <tr>
+                                <td>Situace</td>
+                                <td><span id="room2situation">normální</span></td>
+                            </tr>
+                            <tr>
+                                <td>Počet osob</td>
+                                <td><span id="room2people">2</span></td>
+                            </tr>
+                            <tr>
+                                <td>Personál</td>
+                                <td><span id="room2doctor">ne</span></td>
+                            </tr>
+                            <tr>
+                                <td>Poslední kontrola</td>
+                                <td>před <span id="room2check">20</span> min</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+            </div>
+            </div>
+            <!-- The Modal -->
+            <div class="modal" id="patientModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                            <h4 class="modal-title">Informace o pacientovi <span id="personidx"></span></h4>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+
+                        <!-- Modal body -->
+                        <div class="modal-body">
+                            <table class="table table-hover">
+                                <tbody>
+                                <tr>
+                                    <td>Pokoj</td>
+                                    <td><span id="personroom_id">209</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Aktuální činnost</td>
+                                    <td><span id="personaction">spánek</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Pohyb</td>
+                                    <td><span id="personmovement">10</span>%</td>
+                                </tr>
+                                <tr>
+                                    <td>Poslední kontrola</td>
+                                    <td>před <span id="personcheck">20</span> min</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div class="widget">
+                                <div class="widget-header">Přehled činnosti</div>
+                                <div id="my_dataviz" class="chart-container"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!-- The Modal -->
+            <div class="modal" id="personnelModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                        <!-- Modal Header -->
+                        <div class="modal-header" id="personnelHeader">
+                            <h4 class="modal-title">Informace o personálu <span id="personnelidx"></span></h4>
+                            <button type="button" class="close personnel" id="closepersonnel" data-dismiss="modal">&times;</button>
+                        </div>
+
+                        <!-- Modal body -->
+                        <div class="modal-body">
+                            <table class="table table-hover">
+                                <tbody>
+                                <tr>
+                                    <td>Pokoj</td>
+                                    <td><span id="personnelroom_id">209</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Kontrola posledních 24h</td>
+                                    <td><span id="personnelduration">0</span> min</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- The Modal -->
+            <div class="modal" id="warningModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                        <!-- Modal Header -->
+                        <div class="modal-header" id="warningHeader">
+                            <h4 class="modal-title">Nestandardní událost</h4>
+                            <button type="button" class="close warning" id="closewarning" data-dismiss="modal">&times;</button>
+                        </div>
+
+                        <!-- Modal body -->
+                        <div class="modal-body">
+                            <h5>Na pokoji <span id="warninroom_id">2</span> došlo k pádu</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+        <!-- jQuery library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+        <!-- Popper JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+        <!-- Latest compiled JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <!-- <script src="https://code.jquery.com/jquery-3.3.1.min.js" ></script> -->
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script> -->
+        <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script> -->
+        <script src = "https://d3js.org/d3.v4.min.js"></script>
+        <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+
+            </script>
+
+        <script type="text/javascript" charset="utf-8">
+            const rooms = ["room1", "room2"];
+            const room_facts = ['people', 'situation', 'doctor_str', 'check']
+
+            function update_chart(data) {
+                // set the dimensions and margins of the graph
+                var width = 300
+                    height = 300
+                    margin = 20
+
+                // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
+                var radius = Math.min(width, height) / 2 - margin
+
+                // append the svg object to the div called 'my_dataviz'
+                var svg = d3.select("#my_dataviz")
+                .append("svg")
+                    .attr("width", width)
+                    .attr("height", height)
+                .append("g")
+                    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+                // set the color scale
+                var color = d3.scaleOrdinal()
+                .domain(data)
+                .range(d3.schemeSet2);
+
+                // Compute the position of each group on the pie:
+                var pie = d3.pie()
+                .value(function(d) {return d.value; })
+                var data_ready = pie(d3.entries(data))
+                // Now I know that group A goes from 0 degrees to x degrees and so on.
+
+                // shape helper to build arcs:
+                var arcGenerator = d3.arc()
+                .innerRadius(0)
+                .outerRadius(radius)
+
+                // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
+                svg
+                .selectAll('mySlices')
+                .data(data_ready)
+                .enter()
+                .append('path')
+                    .attr('d', arcGenerator)
+                    .attr('fill', function(d){ return(color(d.data.key)) })
+                    .attr("stroke", "black")
+                    .style("stroke-width", "2px")
+                    .style("opacity", 0.7)
+
+                // Now add the annotation. Use the centroid method to get the best coordinates
+                svg
+                .selectAll('mySlices')
+                .data(data_ready)
+                .enter()
+                .append('text')
+                .text(function(d){ return d.data.key})
+                .attr("transform", function(d) { return "translate(" + arcGenerator.centroid(d) + ")";  })
+                .style("text-anchor", "middle")
+                .style("font-size", 17)
+            }
+
+            setInterval(function (data_uri) {
+    				// document.getElementById('results').innerHTML =
+    					// '<h2>Here is your image:</h2>' +
+    					// '<img src="' + data_uri + '"/>';
+                rooms.forEach(function (room_id) {
+                    $.ajax({
+    					type: "GET",
+    					data: "room_id=" + room_id,
+    					url: "http://127.0.0.1:5000/room_info",
+    					contentType: false,
+    					processData: false,
+    					success: function (jsonresult) {
+                            console.log(jsonresult)
+                            if (jsonresult['error'] == 0) {
+                                room_facts.forEach(function ( fact ) {
+                                    document.getElementById(room_id + fact).innerHTML = jsonresult[fact]
+                                })
+                                if (jsonresult['problem']) {
+                                    let modal = document.getElementById("warningModal")
+                                    modal.style.display = "block"
+                                    elements = document.getElementsByClassName(room_id);
+                                    for (var i = 0; i < elements.length; i++) {
+                                        elements[i].style.backgroundColor="#DB1F48";
+                                    }
+                                }
+                            }
+    					}
+    				})
+                })
+            }, 2000)
+
+            let closeBtn = document.querySelector(".close")
+            closeBtn.onclick = function(){
+                let patient_modal = document.getElementById("patientModal")
+                patient_modal.style.display = "none"
+            }
+
+            let closeBtnPersonnel = document.querySelector(".personnel")
+            closeBtnPersonnel.onclick = function(){
+                let personnel_modal = document.getElementById("personnelModal")
+                personnel_modal.style.display = "none"
+            }
+            let closeBtnWarning = document.querySelector(".warning")
+            closeBtnWarning.onclick = function(){
+                let warning_modal = document.getElementById("warningModal")
+                warning_modal.style.display = "none"
+            }
+
+            const patient_facts = ['idx', 'action', 'movement', 'check', 'room_id'];
+            const personnel_facts = ['idx', 'duration'];
+
+            function get_img_info(px, py) {
+                $.ajax({
+                    type: "GET",
+                    data: "x=" + encodeURIComponent(px) + "&y=" + encodeURIComponent(py) + "&room_id=" + encodeURIComponent("room1"),
+                    url: "http://127.0.0.1:5000/person_info",
+                    contentType: false,
+                    processData: false,
+                    success: function (jsonresult) {
+                        console.log(jsonresult);
+                        if (jsonresult['error'] == 0) {
+                            if (jsonresult['patient']) {
+                                patient_facts.forEach(function ( fact ) {
+                                    document.getElementById('person' + fact).innerHTML = jsonresult[fact]
+                                })
+                                update_chart(jsonresult['actions'])
+                                let modal = document.getElementById("patientModal");
+                                modal.style.display = "block";
+                            } else {
+                                personnel_facts.forEach(function ( fact ) {
+                                    document.getElementById('personnel' + fact).innerHTML = jsonresult[fact]
+                                })
+                                let modal = document.getElementById("personnelModal");
+                                modal.style.display = "block";
+                            }
+
+                        }
+                    }
+                });
+            }
+
+            $( document ).ready(function() {
+            // Handler for .ready() called.
+                document.getElementById("room1").addEventListener('click', function (event) {
+                bounds=this.getBoundingClientRect();
+                var left=bounds.left;
+                var top=bounds.top;
+                var x = event.pageX - left;
+                var y = event.pageY - top;
+                var cw=this.clientWidth
+                var ch=this.clientHeight
+                var iw=this.naturalWidth
+                var ih=this.naturalHeight
+                var px=x/cw*iw
+                var py=y/ch*ih
+                get_img_info(px, py)
+            });
+            document.getElementById("room2").addEventListener('click', function (event) {
+                    bounds=this.getBoundingClientRect();
+                    var left=bounds.left;
+                    var top=bounds.top;
+                    var x = event.pageX - left;
+                    var y = event.pageY - top;
+                    var cw=this.clientWidth
+                    var ch=this.clientHeight
+                    var iw=this.naturalWidth
+                    var ih=this.naturalHeight
+                    var px=x/cw*iw
+                    var py=y/ch*ih
+                    get_img_info(px, py)
+                });
+            });
+
+
+        </script>
+
+    </body>
+</html>
